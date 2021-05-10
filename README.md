@@ -21,4 +21,5 @@ Gdy gra się kończy wyświetlane jest okienko z napisem "Wygrał gracz 1" lub "
 8.Wygrana gracza grającego pionkami czarnymi  
 9.Rozpoczęcie nowej gry po zwycięstwie jednego z graczy  
 
-Wskazane jest przygotowanie specjalnych początkowych rozstawień pionków dla testów 4,5,6,7,8
+Wskazane jest przygotowanie specjalnych początkowych rozstawień pionków dla testów 4,5,6,7,8  
+[link do repozytorium github](https://github.com/matinosal/js_projekt_warcaby)
