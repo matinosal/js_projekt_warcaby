@@ -1,6 +1,7 @@
-import init_data as data
+from init_data import board_setup
 from Game import Game
-from tkinter import *
+from GameUI import GameUI
 
-game = Game(data.board_setup)
-print(game.pawns)
+
+game = Game(board_setup)
+UI = GameUI()
