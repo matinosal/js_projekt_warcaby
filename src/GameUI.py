@@ -3,7 +3,6 @@ from Game import Game
 from init_data import *
 from functools import partial
 from Pawn import Pawn
-
 SIZE = 8
 class GameUI:
     def __init__(self):
@@ -72,21 +71,49 @@ class GameUI:
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
     def clickHandler(self,x,y,board):
         if self.game.checkIfSelectedPawn():
+            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType(x,y) == 'pawn':
+                if not self.game.moveAllowed(x,y):
+                    self.displayWarning()
+                    return
+                pawn_x,pawn_y,color = self.game.getSelectedPawnInfo()
+                move_vect_x = (x - pawn_x) *(-1 if self.game.selectedPawn.getColor() == 'black' else 1)
+                move_vect_y = abs(y - pawn_y)
+                print(move_vect_x,move_vect_y)
+                if move_vect_y == 1 and move_vect_x == 1:
+                    self.displayMove(x, y, pawn_x, pawn_y)
+                    self.game.makeMove(x,y,pawn_x,pawn_y)
+
+                if abs(move_vect_x) == 2 and move_vect_y == 2:
+                    mid_point_x = (x+pawn_x)//2
+                    mid_point_y = (y + pawn_y) // 2
+                    mid_pawn = self.game.board[mid_point_x][mid_point_y]
+                    if not (isinstance(mid_pawn,Pawn) and  mid_pawn.getColor() != color):
+                        self.displayWarning()
+                        return
+                    self.displayMove(x, y, pawn_x, pawn_y)
+                    self.game.makeMove(x, y, pawn_x, pawn_y)
+                    self.hidePawn(mid_point_x,mid_point_y)
+                    self.game.removePawn(mid_point_x, mid_point_y)
+                return
             if not self.game.checkPlayerTurn(x,y):
                 self.displayWarning()
                 return
             if self.game.getClickedFieldType(x,y) == 'pawn':
                 old_x,old_y = self.game.selectedPawn.getCords()
-                self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'B')
+                self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'C')
                 self.game.selectPawn(x, y)
-                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[B]')
+                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
         else:
             if self.game.checkIfEmptyField(x,y) or not self.game.checkPlayerTurn(x,y):
                 self.displayWarning()
                 return
             self.game.selectPawn(x, y)
-            self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[B]')
+            self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
 
-
+    def displayMove(self,x,y,new_x,new_y):
+        self.buttons[x][y].configure(text='B' if self.game.selectedPawn.getColor() == 'white' else 'C')
+        self.buttons[new_x][new_y].configure(text='')
     def displayWarning(self):
         self.warning_info.configure(text='Ruch niedozwolony')
+    def hidePawn(self,x,y):
+        self.buttons[x][y].configure(text='')
