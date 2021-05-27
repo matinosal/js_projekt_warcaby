@@ -70,10 +70,23 @@ class GameUI:
                 if square != None:
                     x,y,color = square.getPawnInfo()
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
-    def clickHandler(self,i,j,board):
-        if not self.game.checkPlayerTurn(i,j):
-            self.displayWarning()
-            return
-        self.buttons[i][j].configure(text='klikniety')
+    def clickHandler(self,x,y,board):
+        if self.game.checkIfSelectedPawn():
+            if not self.game.checkPlayerTurn(x,y):
+                self.displayWarning()
+                return
+            if self.game.getClickedFieldType(x,y) == 'pawn':
+                old_x,old_y = self.game.selectedPawn.getCords()
+                self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'B')
+                self.game.selectPawn(x, y)
+                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[B]')
+        else:
+            if self.game.checkIfEmptyField(x,y) or not self.game.checkPlayerTurn(x,y):
+                self.displayWarning()
+                return
+            self.game.selectPawn(x, y)
+            self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[B]')
+
+
     def displayWarning(self):
         self.warning_info.configure(text='Ruch niedozwolony')

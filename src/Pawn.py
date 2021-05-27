@@ -8,6 +8,8 @@ class Pawn:
         return self.x,self.y,self.color
     def getColor(self):
         return self.color
+    def getCords(self):
+        return self.x,self.y
     def __str__(self):
         return 'Jestem pion x:{0} y:{1} kolor:{2}'.format(self.x,self.y,self.color)
 
