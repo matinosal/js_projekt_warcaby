@@ -4,6 +4,10 @@ class Pawn:
         self.y = y_
         self.color = color
 
+    def getPawnInfo(self):
+        return self.x,self.y,self.color
+    def getColor(self):
+        return self.color
     def __str__(self):
         return 'Jestem pion x:{0} y:{1} kolor:{2}'.format(self.x,self.y,self.color)
 
