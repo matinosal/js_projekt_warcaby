@@ -1,8 +1,8 @@
 import tkinter as tk
-from Game import Game
-from init_data import *
+from .Game import Game
+from .init_data import *
 from functools import partial
-from Pawn import Pawn
+from src.classes.Pawns.Pawn import Pawn
 SIZE = 8
 class GameUI:
     def __init__(self):
@@ -91,7 +91,7 @@ class GameUI:
                         self.displayWarning()
                         return
                     self.displayMove(x, y, pawn_x, pawn_y)
-                    self.game.makeMove(x, y, pawn_x, pawn_y)
+                    self.game.makeMove(x, y, pawn_x, pawn_y,True)
                     self.hidePawn(mid_point_x,mid_point_y)
                     self.game.removePawn(mid_point_x, mid_point_y)
                 return
