@@ -1,5 +1,7 @@
 from src.classes.Pawns.Pawn import Pawn
+from src.classes.Pawns.Queen import Queen
 from .Player import Player
+
 SIZE = 8
 class Game:
     def __init__(self,data):
@@ -19,11 +21,12 @@ class Game:
             #self.player #byc moze kiedys bedzie potrzebne zeby player wiedzial
             #jakie ma pionki
 
-    def makeMove(self,x,y,old_x,old_y,take=False):
+    def makeMove(self,x,y,old_x,old_y):
         self.board[x][y] = self.board[old_x][old_y]
         self.board[old_x][old_y] = None
         self.board[x][y].setNewCoords(x,y)
         self.forcedPawns = []
+        self.checkPromotion(x,y)
 
     def removePawn(self,x,y):
         self.board[x][y] = None
@@ -71,7 +74,6 @@ class Game:
         self.playerTurn = 'black' if self.playerTurn == 'white' else 'white'
         self.selectedPawn = None
         self.forcedMove = False
-        self.forcedPawns = []
         self.scanForMove()
 
     def checkForNextTake(self,x,y):
@@ -99,5 +101,9 @@ class Game:
                 if isinstance(field,Pawn) and field.getColor() == self.playerTurn:
                     x,y = field.getCords()
                     self.checkForNextTake(x,y)
-        print('piony do ruchu: ',self.forcedPawns)
 
+    def checkPromotion(self,x,y):
+        if (self.playerTurn == 'white' and x == 7) or (self.playerTurn=='black' and x == 0):
+            self.promotePawn(x,y)
+    def promotePawn(self,x,y):
+        self.board[x][y] = Queen(x,y,self.playerTurn)

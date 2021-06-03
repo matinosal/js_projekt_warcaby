@@ -3,6 +3,7 @@ from .Game import Game
 from .init_data import *
 from functools import partial
 from src.classes.Pawns.Pawn import Pawn
+from src.classes.Pawns.Queen import Queen
 SIZE = 8
 class GameUI:
     def __init__(self):
@@ -79,8 +80,8 @@ class GameUI:
                 move_vect_x = (x - pawn_x) *(-1 if self.game.selectedPawn.getColor() == 'black' else 1)
                 move_vect_y = abs(y - pawn_y)
                 if move_vect_y == 1 and move_vect_x == 1 and not self.game.forcedMove: #ruch o jedno pole
-                    self.displayMove(x, y, pawn_x, pawn_y)
                     self.game.makeMove(x,y,pawn_x,pawn_y)
+                    self.displayMove(x, y, pawn_x, pawn_y)
                     self.game.changeTurn()
                 if abs(move_vect_x) == 2 and move_vect_y == 2:#ruch o dwa pola(bicie)
                     mid_point_x = (x+pawn_x)//2
@@ -89,8 +90,8 @@ class GameUI:
                     if not (isinstance(mid_pawn,Pawn) and  mid_pawn.getColor() != color):
                         self.displayWarning()
                         return
+                    self.game.makeMove(x, y, pawn_x, pawn_y)
                     self.displayMove(x, y, pawn_x, pawn_y)
-                    self.game.makeMove(x, y, pawn_x, pawn_y,True)
                     self.hidePawn(mid_point_x,mid_point_y)
                     self.game.removePawn(mid_point_x, mid_point_y)
                     if not self.game.checkForNextTake(x,y):
@@ -101,9 +102,9 @@ class GameUI:
                 return
             if self.game.getClickedFieldType(x,y) == 'pawn': # zmiana pionka
                 old_x,old_y = self.game.selectedPawn.getCords()
-                self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'C')
+                self.changeFieldText(old_x,old_y)
                 if self.game.selectPawn(x, y):
-                    self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+                    self.changeFieldText(x,y,True)
                 else:
                     self.displayWarning()
         else:
@@ -111,14 +112,22 @@ class GameUI:
                 self.displayWarning()
                 return
             if self.game.selectPawn(x, y):
-                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+                self.changeFieldText(x,y,True)
             else:
                 self.displayWarning()
 
     def displayMove(self,x,y,new_x,new_y):
-        self.buttons[x][y].configure(text='B' if self.game.selectedPawn.getColor() == 'white' else 'C')
+        self.changeFieldText(x,y)
         self.buttons[new_x][new_y].configure(text='')
+
     def displayWarning(self):
         self.warning_info.configure(text='Ruch niedozwolony')
     def hidePawn(self,x,y):
         self.buttons[x][y].configure(text='')
+    def changeFieldText(self,x,y,select=False):
+        text_ ='B' if self.game.selectedPawn.getColor() == 'white' else 'C'
+        if isinstance(self.game.board[x][y], Queen):
+            text_ = text_ + "d"
+        if select:
+            text_ = "["+text_+"]"
+        self.buttons[x][y].configure(text=text_)
