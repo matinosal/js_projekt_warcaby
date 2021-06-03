@@ -1,4 +1,4 @@
-'''board_setup = [
+board_setup = [
     (0,0,"white"),
     (0,2,"white"),
     (0,4,"white"),
@@ -23,10 +23,4 @@
     (7,3,"black"),
     (7,5,"black"),
     (7,7,"black"),
-]'''
-board_setup =[
-    (7,5,"black"),
-    (5,5,"black"),
-    (4,4,"black"),
-    (6,6,"white"),
 ]
