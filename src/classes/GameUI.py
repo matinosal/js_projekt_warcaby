@@ -16,10 +16,18 @@ class GameUI:
         secondary_c = '#ffffff'
         window = tk.Tk()
         self.makeTextLabels(window)
-
+        button = tk.Button(
+            master=window,
+            text="reset",
+            padx=10,
+            pady=10,
+            command=self.reset
+        )
+        button.pack(side='top')
         pixelVirtual = tk.PhotoImage(width=1, height=1)
         main_frame = tk.Frame(master=window)
         main_frame.pack(side='top')
+
 
         for i in range(SIZE):
             self.buttons.append([])
@@ -49,7 +57,7 @@ class GameUI:
 
     def makeTextLabels(self,window):
         self.turn_info = tk.Label(
-            text='Tura gracza 2',
+            text='Tura gracza 1 (biały)',
             master=window,
             pady=10,
             padx=10,
@@ -162,6 +170,25 @@ class GameUI:
     def changeLabelText(self):
         if self.game.winner != '':
             text_ = 'Wygrał gracz: ' + self.game.winner
+            winnerInfo = tk.Tk()
+            winnerLabel = tk.Label(
+                text=text_,
+                master=winnerInfo,
+                pady=10,
+                padx=10,
+            )
+            winnerLabel.pack(side='top')
         else:
             text_ = 'Tura gracza nr 1 (biały)' if self.game.playerTurn == 'white' else 'Tura gracza nr 2 (czarny)'
         self.turn_info.configure(text=text_)
+    def reset(self):
+        del self.game
+        self.game = Game(board_setup)
+        for i in range(len(self.game.board)):
+            for j in range(len(self.game.board)):
+                if isinstance(self.game.board[i][j],PawnObj):
+                    color = self.game.board[i][j].getColor()
+                    self.buttons[i][j].configure(text= 'B' if 'white'==color else 'C')
+                else:
+                    self.buttons[i][j].configure(text='')
+        self.turn_info.configure(text='Tura gracza: 1 (biały)')
