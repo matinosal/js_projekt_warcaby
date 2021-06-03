@@ -71,19 +71,18 @@ class GameUI:
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
     def clickHandler(self,x,y,board):
         if self.game.checkIfSelectedPawn():
-            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType(x,y) == 'pawn':
+            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType(x,y) == 'pawn': #ruch pionka
                 if not self.game.moveAllowed(x,y):
                     self.displayWarning()
                     return
                 pawn_x,pawn_y,color = self.game.getSelectedPawnInfo()
                 move_vect_x = (x - pawn_x) *(-1 if self.game.selectedPawn.getColor() == 'black' else 1)
                 move_vect_y = abs(y - pawn_y)
-                print(move_vect_x,move_vect_y)
-                if move_vect_y == 1 and move_vect_x == 1:
+                if move_vect_y == 1 and move_vect_x == 1 and not self.game.forcedMove: #ruch o jedno pole
                     self.displayMove(x, y, pawn_x, pawn_y)
                     self.game.makeMove(x,y,pawn_x,pawn_y)
-
-                if abs(move_vect_x) == 2 and move_vect_y == 2:
+                    self.game.changeTurn()
+                if abs(move_vect_x) == 2 and move_vect_y == 2:#ruch o dwa pola(bicie)
                     mid_point_x = (x+pawn_x)//2
                     mid_point_y = (y + pawn_y) // 2
                     mid_pawn = self.game.board[mid_point_x][mid_point_y]
@@ -94,11 +93,13 @@ class GameUI:
                     self.game.makeMove(x, y, pawn_x, pawn_y,True)
                     self.hidePawn(mid_point_x,mid_point_y)
                     self.game.removePawn(mid_point_x, mid_point_y)
+                    if not self.game.checkForNextTake(x,y):
+                        self.game.changeTurn()
                 return
             if not self.game.checkPlayerTurn(x,y):
                 self.displayWarning()
                 return
-            if self.game.getClickedFieldType(x,y) == 'pawn':
+            if self.game.getClickedFieldType(x,y) == 'pawn': # zmiana pionka
                 old_x,old_y = self.game.selectedPawn.getCords()
                 self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'C')
                 self.game.selectPawn(x, y)
