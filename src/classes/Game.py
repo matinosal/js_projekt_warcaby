@@ -9,10 +9,12 @@ class Game:
         self.pawns = []
         self.board = []
         self.playerTurn = 'white'
+        self.winner = ''
         self.selectedPawn = None
         self.players = {'white':Player('white'),'black':Player('black')}
         self.forcedMove = False
         self.forcedPawns = []
+        self.possibleMove = True
         for i in range(SIZE):
             self.board.append([])
             self.board[i] = [None] * 10
@@ -54,10 +56,9 @@ class Game:
         return  True
 
     def checkIfEmptyField(self,x,y):
-        try:
+        if x in range(0,8) and y in range(0,8):
             return self.board[x][y] == None
-        except IndexError as err:
-            return False
+        return True
 
     def getClickedFieldType(self,x,y):
         return 'pawn' if self.board[x][y] != None else 'square'
@@ -74,6 +75,9 @@ class Game:
         self.selectedPawn = None
         self.forcedMove = False
         self.scanForMove()
+        if self.players[self.playerTurn].pawnCount == 0 or not self.possibleMove:
+            self.winner ='biały' if self.getOppositeColor() == 'white' else 'czarny'
+
 
     def checkForNextTake(self,x,y):
         enemyColor = self.getOppositeColor()
@@ -87,10 +91,18 @@ class Game:
                     for mull in range(1,8):
                         x_ += vect[0]
                         y_ += vect[1]
+                        if not x_ in range(1,7) or not y_ in range(1,7):
+                            break;
+                        if isinstance(self.board[x_][y_],PawnObj) and self.board[x_][y_].getColor() == self.playerTurn:
+                            break
                         if isinstance(self.board[x_][y_],PawnObj) and self.checkIfEmptyField(x_+vect[0],y_+vect[1]):
                             self.forcedMove = True
                             self.forcedPawns.append(self.board[x][y])
+                            self.possibleMove = True
                             foundForcedMove = True
+
+                        else:
+                            break
             except IndexError:
                 pass
         try:
@@ -100,20 +112,24 @@ class Game:
                 if not self.checkIfEmptyField(x_p,y_p) and self.board[x_p][y_p].getColor() == enemyColor:
                     x_f = x_p + vect[0]
                     y_f = y_p + vect[1]
-                    if x_f in range(0,8) and y_f in range(0,8) and self.checkIfEmptyField(x_f,y_f):
+                    if self.XYInRange(x_f,y_f) and self.checkIfEmptyField(x_f,y_f):
                         self.forcedMove = True
                         self.forcedPawns.append(self.board[x][y])
+                        self.possibleMove = True
                         foundForcedMove = True
+
         except IndexError:
             pass
-
         return foundForcedMove
     def scanForMove(self):
+        self.possibleMove = False
         for row in self.board:
             for field in row:
                 if isinstance(field,PawnObj) and field.getColor() == self.playerTurn:
                     x,y = field.getCords()
                     self.checkForNextTake(x,y)
+                    if self.possibleMove == False:
+                        self.checkForPossibleMove(x,y,field.getColor())
 
 
     def checkPromotion(self,x,y):
@@ -121,3 +137,23 @@ class Game:
             self.promotePawn(x,y)
     def promotePawn(self,x,y):
         self.board[x][y] = Queen(x,y,self.playerTurn)
+    def XYInRange(self,x,y):
+        if x in range(0,8) and y in range(0,8):
+            return True
+        return False
+    def checkForPossibleMove(self,x,y,color):
+        if isinstance(self.board[x][y],Pawn):
+            y_ = y+1 if color == 'white' else y-1
+            if self.checkIfEmptyField(x+1,y_) or self.checkIfEmptyField(x-1,y_):
+                self.possibleMove = True
+        else:
+            move_vect = [(i, j) for i in [-1, 1] for j in [-1, 1]]
+            for vect in move_vect:
+                new_x = x
+                new_y = y
+                for step in range(0,7):
+                    new_x,new_y = new_x+vect[0],new_y+vect[1]
+                    if self.checkIfEmptyField(new_x,new_y) and self.XYInRange(x,y):
+                        self.possibleMove == True
+                    elif isinstance(self.board[x+vect[0]][y+vect[1]],PawnObj):
+                        break

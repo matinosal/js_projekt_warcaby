@@ -79,7 +79,7 @@ class GameUI:
                 if move_vect_y == 1 and move_vect_x == 1 and not self.game.forcedMove: #ruch o jedno pole
                     self.game.makeMove(x,y,pawn_x,pawn_y)
                     self.displayMove(x, y, pawn_x, pawn_y)
-                    self.game.changeTurn()
+                    self.newTurn()
                 if abs(move_vect_x) == 2 and move_vect_y == 2:#ruch o dwa pola(bicie)
                     mid_point_x = (x+pawn_x)//2
                     mid_point_y = (y + pawn_y) // 2
@@ -92,26 +92,34 @@ class GameUI:
                     self.hidePawn(mid_point_x,mid_point_y)
                     self.game.removePawn(mid_point_x, mid_point_y)
                     if not self.game.checkForNextTake(x,y):
-                        self.game.changeTurn()
+                        self.newTurn()
                 return
             if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'queen':
                 queen_x,queen_y,color = self.game.getSelectedPawnInfo()
                 vect = [queen_x-x,queen_y-y]
-                if self.game.forcedMove:
+                if (abs(vect[0])-abs(vect[1])) == 0:
                     vect = [vect[0]//abs(vect[0]),vect[1]//abs(vect[1])]
-                    if self.game.getClickedFieldType(x+vect[0],y+vect[1]) == 'pawn':
+                    if self.game.forcedMove:
+                        skippedPawn = 0
+                        for step in range(1,abs(queen_x-x)):
+                            print('znalazlem piona na polu:', queen_x - step * vect[0], queen_y - step * vect[1])
+                            if isinstance(self.game.board[queen_x - step*vect[0]][queen_y - step*vect[1]],PawnObj):
+                                skipped_x , skipped_y = queen_x - step*vect[0],queen_y - step*vect[1]
+                                skippedPawn +=1
+                        if skippedPawn == 1:
+                            self.game.makeMove(x, y, queen_x, queen_y)
+                            self.displayMove(x, y, queen_x, queen_y)
+                            self.hidePawn(skipped_x ,skipped_y)
+                            self.game.removePawn(skipped_x ,skipped_y)
+                            if not self.game.checkForNextTake(x, y):
+                                self.newTurn()
+                    else:
+                        for step in range(1,abs(queen_x-x)):
+                            if isinstance(self.game.board[queen_x - step*vect[0]][queen_y - step*vect[1]],PawnObj):
+                                return
                         self.game.makeMove(x, y, queen_x, queen_y)
                         self.displayMove(x, y, queen_x, queen_y)
-                        self.hidePawn(x+vect[0],y+vect[1])
-                        self.game.removePawn(x+vect[0],y+vect[1])
-                        self.game.changeTurn()
-                        if not self.game.checkForNextTake(x, y):
-                            self.game.changeTurn()
-
-                elif (abs(vect[0])-abs(vect[1])) == 0:
-                    self.game.makeMove(x, y, queen_x, queen_y)
-                    self.displayMove(x, y, queen_x, queen_y)
-                    self.game.changeTurn()
+                        self.newTurn()
                 return
 
             if not self.game.checkPlayerTurn(x,y):
@@ -148,3 +156,12 @@ class GameUI:
         if select:
             text_ = "["+text_+"]"
         self.buttons[x][y].configure(text=text_)
+    def newTurn(self):
+        self.game.changeTurn()
+        self.changeLabelText()
+    def changeLabelText(self):
+        if self.game.winner != '':
+            text_ = 'Wygrał gracz: ' + self.game.winner
+        else:
+            text_ = 'Tura gracza nr 1 (biały)' if self.game.playerTurn == 'white' else 'Tura gracza nr 2 (czarny)'
+        self.turn_info.configure(text=text_)
