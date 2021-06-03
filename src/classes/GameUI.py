@@ -2,7 +2,7 @@ import tkinter as tk
 from .Game import Game
 from .init_data import *
 from functools import partial
-from src.classes.Pawns.Pawn import Pawn
+from src.classes.Pawns.PawnObj import PawnObj
 from src.classes.Pawns.Queen import Queen
 SIZE = 8
 class GameUI:
@@ -84,7 +84,7 @@ class GameUI:
                     mid_point_x = (x+pawn_x)//2
                     mid_point_y = (y + pawn_y) // 2
                     mid_pawn = self.game.board[mid_point_x][mid_point_y]
-                    if not (isinstance(mid_pawn,Pawn) and  mid_pawn.getColor() != color):
+                    if not (isinstance(mid_pawn,PawnObj) and  mid_pawn.getColor() != color):
                         self.displayWarning()
                         return
                     self.game.makeMove(x, y, pawn_x, pawn_y)
@@ -97,7 +97,18 @@ class GameUI:
             if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'queen':
                 queen_x,queen_y,color = self.game.getSelectedPawnInfo()
                 vect = [queen_x-x,queen_y-y]
-                if (abs(vect[0])-abs(vect[1])) == 0:
+                if self.game.forcedMove:
+                    vect = [vect[0]//abs(vect[0]),vect[1]//abs(vect[1])]
+                    if self.game.getClickedFieldType(x+vect[0],y+vect[1]) == 'pawn':
+                        self.game.makeMove(x, y, queen_x, queen_y)
+                        self.displayMove(x, y, queen_x, queen_y)
+                        self.hidePawn(x+vect[0],y+vect[1])
+                        self.game.removePawn(x+vect[0],y+vect[1])
+                        self.game.changeTurn()
+                        if not self.game.checkForNextTake(x, y):
+                            self.game.changeTurn()
+
+                elif (abs(vect[0])-abs(vect[1])) == 0:
                     self.game.makeMove(x, y, queen_x, queen_y)
                     self.displayMove(x, y, queen_x, queen_y)
                     self.game.changeTurn()

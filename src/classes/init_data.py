@@ -29,4 +29,5 @@ board_setup =[
     (1,3,"black"),
     (6,6,"white"),
     (6,4,"white"),
+    (4,4,"white"),
 ]

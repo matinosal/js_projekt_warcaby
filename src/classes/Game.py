@@ -1,5 +1,6 @@
 from src.classes.Pawns.Pawn import Pawn
 from src.classes.Pawns.Queen import Queen
+from src.classes.Pawns.PawnObj import PawnObj
 from .Player import Player
 
 SIZE = 8
@@ -78,6 +79,20 @@ class Game:
         enemyColor = self.getOppositeColor()
         move_vect  = [(i,j) for i in [-1,1] for j in [-1,1]]
         foundForcedMove = False
+        if isinstance(self.board[x][y],Queen):
+            try:
+                for vect in move_vect:
+                    x_ = x
+                    y_ = y
+                    for mull in range(1,8):
+                        x_ += vect[0]
+                        y_ += vect[1]
+                        if isinstance(self.board[x_][y_],PawnObj) and self.checkIfEmptyField(x_+vect[0],y_+vect[1]):
+                            self.forcedMove = True
+                            self.forcedPawns.append(self.board[x][y])
+                            foundForcedMove = True
+            except IndexError:
+                pass
         try:
             for vect in move_vect:
                 x_p = x + vect[0]
@@ -96,9 +111,10 @@ class Game:
     def scanForMove(self):
         for row in self.board:
             for field in row:
-                if isinstance(field,Pawn) and field.getColor() == self.playerTurn:
+                if isinstance(field,PawnObj) and field.getColor() == self.playerTurn:
                     x,y = field.getCords()
                     self.checkForNextTake(x,y)
+
 
     def checkPromotion(self,x,y):
         if (self.playerTurn == 'white' and x == 7) or (self.playerTurn=='black' and x == 0):
