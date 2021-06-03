@@ -72,10 +72,7 @@ class GameUI:
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
     def clickHandler(self,x,y,board):
         if self.game.checkIfSelectedPawn():
-            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType(x,y) == 'pawn': #ruch pionka
-                if not self.game.moveAllowed(x,y):
-                    self.displayWarning()
-                    return
+            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'pawn': #ruch pionka
                 pawn_x,pawn_y,color = self.game.getSelectedPawnInfo()
                 move_vect_x = (x - pawn_x) *(-1 if self.game.selectedPawn.getColor() == 'black' else 1)
                 move_vect_y = abs(y - pawn_y)
@@ -97,6 +94,15 @@ class GameUI:
                     if not self.game.checkForNextTake(x,y):
                         self.game.changeTurn()
                 return
+            if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'queen':
+                queen_x,queen_y,color = self.game.getSelectedPawnInfo()
+                vect = [queen_x-x,queen_y-y]
+                if (abs(vect[0])-abs(vect[1])) == 0:
+                    self.game.makeMove(x, y, queen_x, queen_y)
+                    self.displayMove(x, y, queen_x, queen_y)
+                    self.game.changeTurn()
+                return
+
             if not self.game.checkPlayerTurn(x,y):
                 self.displayWarning()
                 return

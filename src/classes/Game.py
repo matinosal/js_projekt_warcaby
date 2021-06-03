@@ -60,10 +60,8 @@ class Game:
 
     def getClickedFieldType(self,x,y):
         return 'pawn' if self.board[x][y] != None else 'square'
-    def getSelectedType(self,x,y):
+    def getSelectedType(self):
         return 'pawn' if  isinstance(self.selectedPawn,Pawn) else 'queen'
-    def moveAllowed(self,x,y):#do napisania jak będzie robione bicie
-        return True
     def getSelectedPawnInfo(self):
         return self.selectedPawn.getPawnInfo()
     def checkPawnToTake(self,x,y):
