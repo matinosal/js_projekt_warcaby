@@ -23,6 +23,7 @@ class Game:
         self.board[x][y] = self.board[old_x][old_y]
         self.board[old_x][old_y] = None
         self.board[x][y].setNewCoords(x,y)
+        self.forcedPawns = []
 
     def removePawn(self,x,y):
         self.board[x][y] = None
@@ -38,10 +39,21 @@ class Game:
         return (self.selectedPawn != None)
 
     def selectPawn(self,x,y):
+        self.selectedPawn = None
+        if self.forcedMove:
+            if self.board[x][y] in self.forcedPawns:
+                self.selectedPawn = self.board[x][y]
+                return True
+            else:
+                return False
         self.selectedPawn = self.board[x][y]
+        return  True
 
     def checkIfEmptyField(self,x,y):
-        return self.board[x][y] == None
+        try:
+            return self.board[x][y] == None
+        except IndexError as err:
+            return False
 
     def getClickedFieldType(self,x,y):
         return 'pawn' if self.board[x][y] != None else 'square'
@@ -59,20 +71,33 @@ class Game:
         self.playerTurn = 'black' if self.playerTurn == 'white' else 'white'
         self.selectedPawn = None
         self.forcedMove = False
+        self.forcedPawns = []
+        self.scanForMove()
+
     def checkForNextTake(self,x,y):
         enemyColor = self.getOppositeColor()
         move_vect  = [(i,j) for i in [-1,1] for j in [-1,1]]
         foundForcedMove = False
-        for vect in move_vect:
-            x_p = x + vect[0]
-            y_p = y + vect[1]
-            if not self.checkIfEmptyField(x_p,y_p) and self.board[x_p][y_p].getColor() == enemyColor:
-                x_f = x_p + vect[0]
-                y_f = y_p + vect[1]
-                if x_f in range(0,8) and y_f in range(0,8) and self.checkIfEmptyField(x_f,y_f):
-                    self.forcedMove = True
-                    self.forcedPawns.append(self.board[x][y])
-                    foundForcedMove = True
+        try:
+            for vect in move_vect:
+                x_p = x + vect[0]
+                y_p = y + vect[1]
+                if not self.checkIfEmptyField(x_p,y_p) and self.board[x_p][y_p].getColor() == enemyColor:
+                    x_f = x_p + vect[0]
+                    y_f = y_p + vect[1]
+                    if x_f in range(0,8) and y_f in range(0,8) and self.checkIfEmptyField(x_f,y_f):
+                        self.forcedMove = True
+                        self.forcedPawns.append(self.board[x][y])
+                        foundForcedMove = True
+        except IndexError:
+            pass
 
         return foundForcedMove
+    def scanForMove(self):
+        for row in self.board:
+            for field in row:
+                if isinstance(field,Pawn) and field.getColor() == self.playerTurn:
+                    x,y = field.getCords()
+                    self.checkForNextTake(x,y)
+        print('piony do ruchu: ',self.forcedPawns)
 

@@ -102,14 +102,18 @@ class GameUI:
             if self.game.getClickedFieldType(x,y) == 'pawn': # zmiana pionka
                 old_x,old_y = self.game.selectedPawn.getCords()
                 self.buttons[old_x][old_y].configure(text='B' if board[x][y].getColor() == 'white' else 'C')
-                self.game.selectPawn(x, y)
-                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+                if self.game.selectPawn(x, y):
+                    self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+                else:
+                    self.displayWarning()
         else:
             if self.game.checkIfEmptyField(x,y) or not self.game.checkPlayerTurn(x,y):
                 self.displayWarning()
                 return
-            self.game.selectPawn(x, y)
-            self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+            if self.game.selectPawn(x, y):
+                self.buttons[x][y].configure(text='[B]' if board[x][y].getColor() == 'white' else '[C]')
+            else:
+                self.displayWarning()
 
     def displayMove(self,x,y,new_x,new_y):
         self.buttons[x][y].configure(text='B' if self.game.selectedPawn.getColor() == 'white' else 'C')
