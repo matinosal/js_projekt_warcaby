@@ -6,12 +6,12 @@ from src.classes.Pawns.PawnObj import PawnObj
 from src.classes.Pawns.Queen import Queen
 SIZE = 8
 class GameUI:
-    def __init__(self):
+    def __init__(self,test=False):
         self.game = Game(board_setup)
         self.buttons = []
-        self.createWindow()
+        self.createWindow(test)
 
-    def createWindow(self):
+    def createWindow(self,test):
         color = "#000000"
         secondary_c = '#ffffff'
         window = tk.Tk()
@@ -24,7 +24,8 @@ class GameUI:
             command=self.reset
         )
         button.pack(side='top')
-        pixelVirtual = tk.PhotoImage(width=1, height=1)
+        if not test:
+            pixelVirtual = tk.PhotoImage(width=1, height=1)
         main_frame = tk.Frame(master=window)
         main_frame.pack(side='top')
 
@@ -35,7 +36,7 @@ class GameUI:
                 button = tk.Button(
                     master=main_frame,
                     relief=tk.RAISED,
-                    image=pixelVirtual,
+                    image=pixelVirtual if not test else None,
                     borderwidth=1,
                     width=100,
                     height=100,
@@ -43,7 +44,7 @@ class GameUI:
                     bg=secondary_c,
                     text="",
                     compound="c",
-                    command=partial(self.clickHandler, (SIZE - 1 - i), j, self.game.board)
+                    command=partial(self.clickHandler, (SIZE - 1 - i), j)
                 )
                 self.buttons[i].append(button)
                 button.grid(row=i, column=j)
@@ -53,7 +54,8 @@ class GameUI:
             secondary_c = '#ffffff' if color == '#000000' else '#000000'
         self.buttons.reverse()
         self.setPawns(self.game.board)
-        window.mainloop()
+        if not test:
+            window.mainloop()
 
     def makeTextLabels(self,window):
         self.turn_info = tk.Label(
@@ -78,7 +80,7 @@ class GameUI:
                 if square != None:
                     x,y,color = square.getPawnInfo()
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
-    def clickHandler(self,x,y,board):
+    def clickHandler(self,x,y):
         if self.game.checkIfSelectedPawn():
             if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'pawn': #ruch pionka
                 pawn_x,pawn_y,color = self.game.getSelectedPawnInfo()
