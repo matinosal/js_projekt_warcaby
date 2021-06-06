@@ -34,7 +34,6 @@ class Game:
     def removePawn(self,x,y):
         self.board[x][y] = None
         self.players[self.getOppositeColor()].decrementPawnAmount()
-        print("zbito piona na: ",x,y)
 
     def checkPlayerTurn(self,x,y):
         #tu mozna dac jakis exception ze nie mozna klikac bo wywala blad
@@ -76,7 +75,7 @@ class Game:
         self.forcedMove = False
         self.scanForMove()
         if self.players[self.playerTurn].pawnCount == 0 or not self.possibleMove:
-            self.winner ='biały' if self.getOppositeColor() == 'white' else 'czarny'
+            self.winner = 'biały' if self.getOppositeColor() == 'white' else 'czarny'
 
 
     def checkForNextTake(self,x,y):
@@ -100,9 +99,6 @@ class Game:
                             self.forcedPawns.append(self.board[x][y])
                             self.possibleMove = True
                             foundForcedMove = True
-
-                        else:
-                            break
             except IndexError:
                 pass
         try:
@@ -154,6 +150,6 @@ class Game:
                 for step in range(0,7):
                     new_x,new_y = new_x+vect[0],new_y+vect[1]
                     if self.checkIfEmptyField(new_x,new_y) and self.XYInRange(x,y):
-                        self.possibleMove == True
+                        self.possibleMove = True
                     elif isinstance(self.board[x+vect[0]][y+vect[1]],PawnObj):
                         break

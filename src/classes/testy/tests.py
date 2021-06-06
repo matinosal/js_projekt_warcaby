@@ -58,6 +58,7 @@ class MyTestCase(unittest.TestCase):
     def test_4(self):
         ui = src.classes.GameUI.GameUI(True)
         test_board = [
+            (7, 7, "black"),
             (1, 1, "black"),
             (3, 3, "black"),
             (4, 4, "white")
@@ -100,12 +101,43 @@ class MyTestCase(unittest.TestCase):
         ui.game = game
         ui.clickHandler(6, 6)  # wybór piona białego
         ui.clickHandler(7, 7)  # ruch pionem na pole 7,7
-        self.assertEqual(True, isinstance(ui.game.board[7][7],Queen)) #sprawdzam czy typ pionka sie zmienił z Pawn na Queen
+
         ui.clickHandler(1, 1)  # wybór piona czarnego
         ui.clickHandler(0, 0)  # ruch pionem na pole 0,0
         white_queen = ui.game.board[7][7]
         ui.clickHandler(7, 7)  # wybór białej królowej
         ui.clickHandler(2, 2)
+        self.assertEqual(white_queen, ui.game.board[2][2])
+
+        del ui
+    def test_7(self):
+        ui = src.classes.GameUI.GameUI(True)
+        test_board = [
+            (5, 5, "black"),
+            (6, 6, "white")
+        ]
+        game = src.classes.Game.Game(test_board)
+        ui.game = game
+        ui.game.changeTurn() #zmieniam turę dla czarnego gracza
+        self.assertEqual('', ui.game.winner)
+        ui.clickHandler(5, 5)  # wybór piona czarnego
+        ui.clickHandler(7, 7)  # ruch pionem na pole 7,7 bicie piona na 6,6
+        self.assertEqual('czarny',ui.lastGameWinner)
+
+        del ui
+    def test_8(self):
+        ui = src.classes.GameUI.GameUI(True)
+        test_board = [
+            (5, 5, "black"),
+            (6, 6, "white")
+        ]
+        game = src.classes.Game.Game(test_board)
+        ui.game = game
+        ui.game.changeTurn() #zmieniam turę dla czarnego gracza
+        ui.clickHandler(5, 5)  # wybór piona czarnego
+        ui.clickHandler(7, 7)  # ruch pionem na pole 7,7 bicie piona na 6,6
+        self.assertEqual(ui.game.players['black'].pawnCount,12)
+        self.assertEqual(ui.game.players['black'].pawnCount, 12)
         del ui
 if __name__ == '__main__':
     unittest.main()

@@ -7,3 +7,7 @@ class Player:
         self.pawnCount += 1
     def decrementPawnAmount(self):
         self.pawnCount -= 1
+    def __str__(self):
+        return "jestem {0} pionki: {1}".format(self.color,self.pawnCount)
+    def __repr__(self):
+        return "jestem {0} pionki: {1}".format(self.color,self.pawnCount)

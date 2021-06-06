@@ -10,7 +10,7 @@ class GameUI:
         self.game = Game(board_setup)
         self.buttons = []
         self.createWindow(test)
-
+        self.lastGameWinner = ''
     def createWindow(self,test):
         color = "#000000"
         secondary_c = '#ffffff'
@@ -112,7 +112,6 @@ class GameUI:
                     if self.game.forcedMove:
                         skippedPawn = 0
                         for step in range(1,abs(queen_x-x)):
-                            print('znalazlem piona na polu:', queen_x - step * vect[0], queen_y - step * vect[1])
                             if isinstance(self.game.board[queen_x - step*vect[0]][queen_y - step*vect[1]],PawnObj):
                                 skipped_x , skipped_y = queen_x - step*vect[0],queen_y - step*vect[1]
                                 skippedPawn +=1
@@ -180,10 +179,12 @@ class GameUI:
                 padx=10,
             )
             winnerLabel.pack(side='top')
+            self.reset()
         else:
             text_ = 'Tura gracza nr 1 (biały)' if self.game.playerTurn == 'white' else 'Tura gracza nr 2 (czarny)'
-        self.turn_info.configure(text=text_)
+            self.turn_info.configure(text=text_)
     def reset(self):
+        self.lastGameWinner = self.game.winner
         del self.game
         self.game = Game(board_setup)
         for i in range(len(self.game.board)):
