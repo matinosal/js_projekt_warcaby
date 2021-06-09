@@ -7,6 +7,7 @@ from src.classes.Pawns.Queen import Queen
 SIZE = 8
 class GameUI:
     def __init__(self,test=False):
+        '''Konstruktor klasy - flaga test, blokuje wyswietlania glownego okna, uzywana przy wywolaniu testow'''
         self.game = Game(board_setup)
         self.buttons = []
         self.createWindow(test)
@@ -81,6 +82,8 @@ class GameUI:
                     x,y,color = square.getPawnInfo()
                     self.buttons[x][y].configure(text= 'B' if 'white'==color else 'C')
     def clickHandler(self,x,y):
+        '''Funkcja obsługuje wszystkie kliknięcia przycisku na planszy'''
+        self.warning_info.configure(text='')
         if self.game.checkIfSelectedPawn():
             if self.game.checkIfEmptyField(x,y) and self.game.getSelectedType() == 'pawn': #ruch pionka
                 pawn_x,pawn_y,color = self.game.getSelectedPawnInfo()
@@ -155,8 +158,10 @@ class GameUI:
         self.buttons[new_x][new_y].configure(text='')
 
     def displayWarning(self):
+        '''Wysiwetla informacje o blednym ruchu'''
         self.warning_info.configure(text='Ruch niedozwolony')
     def hidePawn(self,x,y):
+        '''Czyści tekst wybranego przyciska'''
         self.buttons[x][y].configure(text='')
     def changeFieldText(self,x,y,select=False):
         text_ ='B' if self.game.selectedPawn.getColor() == 'white' else 'C'
@@ -184,6 +189,7 @@ class GameUI:
             text_ = 'Tura gracza nr 1 (biały)' if self.game.playerTurn == 'white' else 'Tura gracza nr 2 (czarny)'
             self.turn_info.configure(text=text_)
     def reset(self):
+        '''Funkcja uruchamiana po kliknieciu przycisku reset, ustawia od nowa wszystkie piony na planszy'''
         self.lastGameWinner = self.game.winner
         del self.game
         self.game = Game(board_setup)

@@ -6,6 +6,7 @@ from .Player import Player
 SIZE = 8
 class Game:
     def __init__(self,data):
+        '''Konstruktor, przyjmujący jako argument ułożenie pionów na planszy'''
         self.pawns = []
         self.board = []
         self.playerTurn = 'white'
@@ -25,6 +26,7 @@ class Game:
             #jakie ma pionki
 
     def makeMove(self,x,y,old_x,old_y):
+        '''Przenosi referencje do obiektu pionka do innego miejsca w macierzy'''
         self.board[x][y] = self.board[old_x][old_y]
         self.board[old_x][old_y] = None
         self.board[x][y].setNewCoords(x,y)
@@ -32,18 +34,20 @@ class Game:
         self.checkPromotion(x,y)
 
     def removePawn(self,x,y):
+        '''Usuwa referencje do obiektu pionka z macierzy board i zmniejsza ilosc pionkow danego gracza'''
         self.board[x][y] = None
         self.players[self.getOppositeColor()].decrementPawnAmount()
 
     def checkPlayerTurn(self,x,y):
-        #tu mozna dac jakis exception ze nie mozna klikac bo wywala blad
-        #no idealne miejsce na to
+        '''sprawdza czy kolor bierki jest taki sam jak gracza'''
         return self.board[x][y].getColor() == self.playerTurn
 
     def checkIfSelectedPawn(self):
+        '''zwraca informacje o tym czy jakis pionek zostal wybrany'''
         return (self.selectedPawn != None)
 
     def selectPawn(self,x,y):
+        '''wybiera danego piona'''
         self.selectedPawn = None
         if self.forcedMove:
             if self.board[x][y] in self.forcedPawns:
@@ -55,6 +59,7 @@ class Game:
         return  True
 
     def checkIfEmptyField(self,x,y):
+        '''sprawdza czy podane pole jest puste'''
         if x in range(0,8) and y in range(0,8):
             return self.board[x][y] == None
         return True
@@ -65,11 +70,10 @@ class Game:
         return 'pawn' if  isinstance(self.selectedPawn,Pawn) else 'queen'
     def getSelectedPawnInfo(self):
         return self.selectedPawn.getPawnInfo()
-    def checkPawnToTake(self,x,y):
-        pass #sprawdzenie czy po biciu są pionki do zabrania
     def getOppositeColor(self):
         return 'black' if self.playerTurn == 'white' else 'white'
     def changeTurn(self):
+        '''zmiana tury gracza oraz wywolanie skanowania w poszukiwaniu ruchu/bicia'''
         self.playerTurn = 'black' if self.playerTurn == 'white' else 'white'
         self.selectedPawn = None
         self.forcedMove = False
@@ -79,6 +83,7 @@ class Game:
 
 
     def checkForNextTake(self,x,y):
+        '''sprawdzenie czy jest bicie daną bierką, sprawdzenie różni się od typu bierki'''
         enemyColor = self.getOppositeColor()
         move_vect  = [(i,j) for i in [-1,1] for j in [-1,1]]
         foundForcedMove = False
@@ -118,6 +123,7 @@ class Game:
             pass
         return foundForcedMove
     def scanForMove(self):
+        '''skanuje całą planszę w poszukiwaniu ruchów gracza '''
         self.possibleMove = False
         for row in self.board:
             for field in row:
@@ -129,15 +135,18 @@ class Game:
 
 
     def checkPromotion(self,x,y):
+        '''sprawdza czy dany pion ma zostac wypromowany'''
         if (self.playerTurn == 'white' and x == 7) or (self.playerTurn=='black' and x == 0):
             self.promotePawn(x,y)
     def promotePawn(self,x,y):
+        '''promocja piona na damkę'''
         self.board[x][y] = Queen(x,y,self.playerTurn)
     def XYInRange(self,x,y):
         if x in range(0,8) and y in range(0,8):
             return True
         return False
     def checkForPossibleMove(self,x,y,color):
+        '''Sprawdza czy gracz moze wykonac ruch daną bierka, jest to wymagane zeby mozna bylo doprowadzic do remisu z powodu braku ruchu'''
         if isinstance(self.board[x][y],Pawn):
             y_ = y+1 if color == 'white' else y-1
             if self.checkIfEmptyField(x+1,y_) or self.checkIfEmptyField(x-1,y_):
